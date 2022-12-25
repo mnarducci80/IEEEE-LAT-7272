@@ -1,0 +1,58 @@
+#include "mcc_generated_files/mcc.h"
+
+void main(void)
+{
+    // initialize the device
+    SYSTEM_Initialize();
+
+    // Enable the Global Interrupts
+    INTERRUPT_GlobalInterruptEnable();
+
+    // Enable the Peripheral Interrupts
+    INTERRUPT_PeripheralInterruptEnable();
+    
+    adc_result_t ADC = 0;
+    int IntADC = 0;
+    void serial( int ADC);
+    
+    //int bandera = 0;
+    
+    while (1)
+    {
+        // Programa
+        if(ADC_IsConversionDone()){
+            ADC = ADC_GetConversionResult();
+            IntADC = ADC-520;
+            IntADC = IntADC*IntADC;
+            serial((int)IntADC);
+            /*
+            if(bandera){
+                PORTB |= 0b00001000;
+                bandera = 0;
+            }else{
+                PORTB &= 0b11110111;
+                bandera=1;
+            }
+            */
+        }
+    }
+}
+
+// Definicion de funciones
+void serial( int IntADC){
+    char Digito[4];
+    int digito = IntADC % 10;
+    Digito[0] = digito +48;
+    digito = (IntADC/10) % 10;
+    Digito[1] = digito +48;
+    digito = (IntADC/100) % 10;
+    Digito[2] = digito +48;
+    digito = (IntADC/1000) % 10;
+    Digito[3] = digito +48;
+
+    EUSART_Write(Digito[3]);
+    EUSART_Write(Digito[2]);
+    EUSART_Write(Digito[1]);
+    EUSART_Write(Digito[0]);
+    EUSART_Write('\n');
+}
